@@ -1,0 +1,33 @@
+CLASS zcl_40_19_zeitstemp_manipul DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_oo_adt_classrun .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_40_19_zeitstemp_manipul IMPLEMENTATION.
+
+
+  METHOD if_oo_adt_classrun~main.
+
+   DATA var_utc TYPE utclong.
+
+   var_utc = utclong_current(  ).
+
+
+   out->write( var_utc ).
+
+   var_utc = utclong_add( val = var_utc days = 0 hours = + 2  ).
+
+   out->write( var_utc ).
+
+
+  ENDMETHOD.
+ENDCLASS.

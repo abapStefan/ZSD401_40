@@ -1,0 +1,11 @@
+@EndUserText.label: 'Mein AUTH object'
+@MappingRole: true
+define role ZS4D401_40_AIRPORTS {
+    grant 
+        select
+            on
+                ZS4D401_40_AIRPORTS
+                    where
+                        (Country) = aspect pfcg_auth( /DMO/TRVL, /DMO/CNTRY, ACTVT = '03');
+                        
+}

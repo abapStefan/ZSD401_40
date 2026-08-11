@@ -1,0 +1,99 @@
+CLASS zcl_40_solution_23 DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS ZCL_40_SOLUTION_23 IMPLEMENTATION.
+
+
+  METHOD if_oo_adt_classrun~main.
+
+    CONSTANTS c_carrier_id TYPE /dmo/carrier_id VALUE 'LH'.                   " Übung 18_3
+*        CONSTANTS c_carrier_id TYPE /dmo/carrier_id VALUE 'UA'.
+
+    TRY.
+*        DATA(carrier) = NEW lcl_carrier( i_carrier_id = c_carrier_id ).   ). " übung 23 NEW funktioniert nicht mehr
+
+         DATA(carrier) = lcl_carrier=>get_instance( i_carrier_id = c_carrier_id ).  " Übung 23
+
+         DATA(carrier2) = lcl_carrier=>get_instance( i_carrier_id = c_carrier_id ). " Übung 23
+
+
+        out->write( name = `Carrier Overview`
+                    data = carrier->get_output(  ) ).
+      CATCH cx_abap_invalid_value.
+        out->write( |Carrier { c_carrier_id } does not exist| ).
+
+      CATCH cx_abap_auth_check_exception.                                   " Übung 18_7
+       out->write( |Keine Berechtigung für die Fluggesellschaft { c_carrier_id }| ).
+
+    ENDTRY.
+
+    IF carrier IS BOUND.
+      out->write(  `--------------------------------------------------` ).
+
+      "Find a passenger flight from Frankfurt to New York
+      "starting as soon as possible
+      "with at least 5 free seats
+      DATA(today) = cl_abap_context_info=>get_system_date( ).
+
+      carrier->find_passenger_flight(
+         EXPORTING
+           i_airport_from_id = 'FRA'
+           i_airport_to_id   = 'JFK'
+           i_from_date       = today
+           i_seats           = 5
+         IMPORTING
+           e_flight =     DATA(pass_flight)
+           e_days_later = DATA(days_later)
+               ).
+
+      IF pass_flight IS BOUND.
+        out->write( name = |Found a suitable passenger flight in { days_later } days:|
+*                    data = pass_flight->get_description( ) ).          " Übung 22
+*                    data = pass_flight->lif_output~get_output(  ) ).   " Übung 22 nach alias
+                     data = pass_flight->get_output( ) ).
+
+      ELSE.
+        out->write( data = `No passenger flight found` ).
+      ENDIF.
+
+      out->write(  `--------------------------------------------------` ).
+
+      "Find a cargo flight from Frankfurt to New York
+      "starting as soon as possible
+      "with at least 1200 KG free capacity
+      carrier->find_cargo_flight(
+         EXPORTING
+           i_airport_from_id = 'FRA'
+           i_airport_to_id   = 'JFK'
+           i_from_date       = today
+           i_cargo           = 1200
+         IMPORTING
+           e_flight =     DATA(cargo_flight)
+           e_days_later = DATA(days_later2)
+               ).
+
+      IF cargo_flight IS BOUND.
+        out->write( name = |Found a suitable cargo flight in { days_later2 } days:|
+*                   data = cargo_flight->get_description( ) ).            " Übung 22
+*                   data = cargo_flight->lif_output~get_output( ) ).      " Übung 22 nach Alias
+                    data = cargo_flight->get_output( ) ).
+
+      ELSE.
+        out->write( data = `No cargo flight found` ).
+      ENDIF.
+
+    ENDIF.
+
+  ENDMETHOD.
+ENDCLASS.
